@@ -277,7 +277,7 @@
     </div>
 
     <script>
-        // 🌙 Modo oscuro
+        // 🌙 Cambiar entre modo oscuro y claro
         function toggleTheme() {
             const html = document.documentElement;
             const logo = document.getElementById('logo');
@@ -295,33 +295,79 @@
 
         // 🔧 Configuración de GitHub
         const GITHUB_USER = 'RafaV29';     // 👈 CAMBIA: tu usuario de GitHub
-        const GITHUB_REPO = 'cps-mexico'; // 👈 CAMBIA: nombre de tu repo
+        const GITHUB_REPO = 'cps-mexico';        // 👈 CAMBIA: nombre de tu repositorio
         const BASE_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}/json`;
 
-        // 🗺️ Mapeo de códigos de estado (Envia.com 2D → JSON)
-        const estadoClaves = {
+        // 🔢 Mapeo de los primeros 2 dígitos del CP → estado clave
+        const cpToEstado = {
+            "01": "CDMX", "02": "CDMX", "03": "CDMX", "04": "CDMX", "05": "CDMX", "06": "CDMX", "07": "CDMX", "08": "EM",
+            "09": "EM", "10": "EM", "11": "EM", "12": "EM", "13": "EM", "14": "EM", "15": "EM", "16": "EM",
+            "17": "EM", "18": "EM", "19": "EM",
+            "20": "AG", "21": "BC", "22": "BC", "23": "BS", "24": "CM", "25": "CS", "26": "CH", "27": "CL",
+            "28": "CO", "29": "CH", "30": "CH", "31": "CH", "32": "CH", "33": "CH", "34": "CH", "35": "DG",
+            "36": "GT", "37": "GT", "38": "GT", "39": "GT",
+            "40": "GR", "41": "GR", "42": "GR", "43": "GR", "44": "JA", "45": "JA", "46": "JA", "47": "JA",
+            "48": "JA", "49": "JA",
+            "50": "EM", "51": "EM", "52": "EM", "53": "EM", "54": "EM", "55": "EM", "56": "EM", "57": "EM",
+            "58": "MI", "59": "MI",
+            "60": "MZ", "61": "MZ", "62": "OA", "63": "OA", "64": "NL", "65": "NL", "66": "NL", "67": "NL",
+            "68": "OA", "69": "OA",
+            "70": "CH", "71": "CH", "72": "PU", "73": "PU", "74": "PU", "75": "PU", "76": "PU", "77": "QR",
+            "78": "SL", "79": "SL",
+            "80": "SI", "81": "SI", "82": "SI", "83": "SO", "84": "SO", "85": "SO", "86": "TB", "87": "TM",
+            "88": "TM", "89": "TM",
+            "90": "TL", "91": "VE", "92": "VE", "93": "VE", "94": "VE", "95": "VE", "96": "VE", "97": "YU",
+            "98": "ZT", "99": "ZT"
+        };
+
+        // 🗺️ Nombre completo del estado
+        const nombreEstado = {
+            "AG": "Aguascalientes",
+            "BC": "Baja California",
+            "BS": "Baja California Sur",
+            "CM": "Campeche",
+            "CS": "Chiapas",
+            "CH": "Chihuahua",
+            "CDMX": "Ciudad de México",
+            "CO": "Coahuila",
+            "CL": "Colima",
+            "DG": "Durango",
+            "GT": "Guanajuato",
+            "GR": "Guerrero",
+            "HG": "Hidalgo",
+            "JA": "Jalisco",
+            "EM": "México",
+            "MI": "Michoacán",
+            "MO": "Morelos",
+            "NA": "Nayarit",
+            "NL": "Nuevo León",
+            "OA": "Oaxaca",
+            "PU": "Puebla",
+            "QT": "Querétaro",
+            "QR": "Quintana Roo",
+            "SL": "San Luis Potosí",
+            "SI": "Sinaloa",
+            "SO": "Sonora",
+            "TB": "Tabasco",
+            "TM": "Tamaulipas",
+            "TL": "Tlaxcala",
+            "VE": "Veracruz",
+            "YU": "Yucatán",
+            "ZA": "Zacatecas"
+        };
+
+        // 📦 Mapeo de estado clave → archivo JSON
+        const estadoJsonMap = {
             "AG": "AGU", "BC": "BCN", "BS": "BCS", "CM": "CAM", "CS": "CHP",
-            "CH": "CHH", "CX": "CMX", "CO": "COA", "CL": "COL", "DG": "DGO",
+            "CH": "CHH", "CDMX": "CMX", "CO": "COA", "CL": "COL", "DG": "DGO",
             "GT": "GTO", "GR": "GRO", "HG": "HGO", "JA": "JAL", "EM": "MEX",
             "MI": "MIC", "MO": "MOR", "NA": "NAY", "NL": "NLE", "OA": "OAX",
-            "PU": "PUE", "QR": "ROO", "SL": "SLP", "SI": "SIN", "SO": "SON",
-            "TB": "TAB", "TM": "TAM", "TL": "TLA", "VE": "VER", "YU": "YUC", "ZA": "ZAC"
+            "PU": "PUE", "QT": "QRO", "QR": "ROO", "SL": "SLP", "SI": "SIN",
+            "SO": "SON", "TB": "TAB", "TM": "TAM", "TL": "TLA", "VE": "VER",
+            "YU": "YUC", "ZA": "ZAC"
         };
 
-        // ✅ Estados oficiales Envia.com (2 dígitos)
-        const estadosEnvia = {
-            "Aguascalientes": "AG", "Baja California": "BC", "Baja California Sur": "BS",
-            "Campeche": "CM", "Chiapas": "CS", "Chihuahua": "CH", "Ciudad de México": "CX",
-            "Distrito Federal": "DF", "Coahuila": "CO", "Colima": "CL", "Durango": "DG",
-            "Guanajuato": "GT", "Guerrero": "GR", "Hidalgo": "HG", "Jalisco": "JA",
-            "México": "EM", "Michoacán": "MI", "Morelos": "MO", "Nayarit": "NA",
-            "Nuevo León": "NL", "Oaxaca": "OA", "Puebla": "PU", "Querétaro": "QT",
-            "Quintana Roo": "QR", "San Luis Potosí": "SL", "Sinaloa": "SI", "Sonora": "SO",
-            "Tabasco": "TB", "Tamaulipas": "TM", "Tlaxcala": "TL", "Veracruz": "VE",
-            "Yucatán": "YU", "Zacatecas": "ZA"
-        };
-
-        // ✅ Autocompletar desde JSON en GitHub
+        // ✅ Autocompletar desde GitHub
         async function autocompletarDesdeGitHub(tipo) {
             const cpInput = document.getElementById(`${tipo}-postalCode`);
             const cityInput = document.getElementById(`${tipo}-city`);
@@ -339,15 +385,58 @@
                 return;
             }
 
-            const estadoCodigo = cp.substring(0, 2);
-            const estadoNombre = Object.keys(estadosEnvia).find(key => estadosEnvia[key] === estadoCodigo);
-            if (!estadoNombre) {
+            const cpPrefix = cp.substring(0, 2);
+            const estadoClave = cpToEstado[cpPrefix];
+
+            if (!estadoClave) {
                 statusSpan.textContent = 'Estado no soportado.';
                 statusSpan.style.color = 'red';
                 return;
             }
 
-            const jsonKey = estadoClaves[estadoCodigo];
+            const estadoNombre = nombreEstado[estadoClave];
+            const codigo2D = {
+                "Aguascalientes": "AG",
+                "Baja California": "BC",
+                "Baja California Sur": "BS",
+                "Campeche": "CM",
+                "Chiapas": "CS",
+                "Chihuahua": "CH",
+                "Ciudad de México": "CX",
+                "Coahuila": "CO",
+                "Colima": "CL",
+                "Durango": "DG",
+                "Guanajuato": "GT",
+                "Guerrero": "GR",
+                "Hidalgo": "HG",
+                "Jalisco": "JA",
+                "México": "EM",
+                "Michoacán": "MI",
+                "Morelos": "MO",
+                "Nayarit": "NA",
+                "Nuevo León": "NL",
+                "Oaxaca": "OA",
+                "Puebla": "PU",
+                "Querétaro": "QT",
+                "Quintana Roo": "QR",
+                "San Luis Potosí": "SL",
+                "Sinaloa": "SI",
+                "Sonora": "SO",
+                "Tabasco": "TB",
+                "Tamaulipas": "TM",
+                "Tlaxcala": "TL",
+                "Veracruz": "VE",
+                "Yucatán": "YU",
+                "Zacatecas": "ZA"
+            }[estadoNombre];
+
+            if (!codigo2D) {
+                statusSpan.textContent = 'Código de estado inválido.';
+                statusSpan.style.color = 'red';
+                return;
+            }
+
+            const jsonKey = estadoJsonMap[codigo2D];
             if (!jsonKey) {
                 statusSpan.textContent = 'Archivo no disponible.';
                 statusSpan.style.color = 'red';
@@ -358,19 +447,15 @@
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('Red no disponible');
+                if (!response.ok) throw new Error('No disponible');
 
                 const data = await response.json();
                 const asentamiento = data.find(item => item.d_codigo === cp);
 
                 if (asentamiento) {
-                    const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || asentamiento.d_estado;
-                    const estadoOficial = asentamiento.d_estado;
-                    const codigo2D = estadosEnvia[estadoOficial];
-
+                    const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || estadoNombre;
                     cityInput.value = ciudad;
-                    stateInput.value = codigo2D || estadoCodigo;
-
+                    stateInput.value = codigo2D;
                     statusSpan.textContent = `✓ ${ciudad}`;
                     statusSpan.style.color = 'green';
                 } else {
@@ -384,11 +469,11 @@
             }
         }
 
-        // Asociar eventos
+        // 🔗 Asociar eventos
         document.getElementById('origin-postalCode').addEventListener('blur', () => autocompletarDesdeGitHub('origin'));
         document.getElementById('destination-postalCode').addEventListener('blur', () => autocompletarDesdeGitHub('destination'));
 
-        // ✅ Intentar con múltiples carriers
+        // 🚚 Intentar con múltiples carriers
         const carriersToTry = ["fedex", "dhl", "estafeta", "paquetexpress", "redpack", "ninetynineminutes"];
 
         async function cotizarConMultiplesCarriers() {
@@ -460,7 +545,7 @@
             }];
 
             try {
-                const response = await fetch('/api/rate', {
+                const response = await fetch('https://TU-COTIZADOR.vercel.app/api/rate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ origin, destination, packages, shipment: { type: 0, carrier } })
