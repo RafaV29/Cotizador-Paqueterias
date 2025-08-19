@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="es" data-theme="light">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cotizador de Envíos - Tu Empresa</title>
+    <style>
+        :root {
+            --bg: #f4f7f6;
+            --card-bg: #fff;
+            --text: #333;
+            --label: #555;
+            --border: #e0e0e0;
+            --primary: #007bff;
+            --primary-hover: #0056b3;
+            --error: #d93025;
+            --loader: #555;
+        }
+
+        [data-theme="dark"] {
+            --bg: #1a1a1a;
+            --card-bg: #2d2d2d;
+            --text: #e0e0e0;
+            --label: #bbb;
+            --border: #444;
+            --primary: #0069d9;
+            --primary-hover: #005cbf;
+            --error: #f88;
+            --loader: #aaa;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--text);
+            transition: background-color 0.3s, color 0.3s;
+            display: flex;
+            justify-content: center;
+            padding: 2em 1em;
+        }
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: var(--card-bg);
+            padding: 2em;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transition: box-shadow 0.3s;
+        }
+        h1 { color: var(--text); text-align: center; }
+        form { display: flex; flex-direction: column; gap: 20px; }
+        .form-section {
+            border: 1px solid var(--border);
+            padding: 1.5em;
+            border-radius: 8px;
+        }
+        .form-section h3 {
+            margin-top: 0;
+            color: var(--primary);
+        }
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+        label {
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: var(--label);
+        }
+        input {
+            padding: 10px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1em;
+            background: var(--bg);
+            color: var(--text);
+        }
+        .cp-status {
+            font-size: 0.8em;
+            color: var(--label);
+            position: absolute;
+            bottom: -18px;
+            left: 0;
+            height: 1em;
+        }
+        button {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: background-color 0.3s;
+            margin-top: 1em;
+        }
+        button:hover {
+            background-color: var(--primary-hover);
+        }
+        button:disabled {
+            background-color: #a0a0a0;
+            cursor: not-allowed;
+        }
+        #results-container {
+            margin-top: 2em;
+        }
+        .loader {
+            text-align: center;
+            font-size: 1.2em;
+            color: var(--loader);
+        }
+        .result-card {
+            background: #f9f9f9;
+            border: 1px solid var(--border);
+            border-left: 5px solid var(--primary);
+            padding: 15px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        .result-card .carrier {
+            font-weight: bold;
+            font-size: 1.2em;
+            text-transform: capitalize;
+        }
+        .result-card .price {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #28a745;
+        }
+        .error {
+            color: var(--error);
+            font-weight: bold;
+            text-align: center;
+        }
+        .theme-toggle {
+            position: absolute;
+            top: 1em;
+            right: 1em;
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+        }
+        .logo {
+            width: 180px;
+            margin: 0 auto 1em auto;
+            display: block;
+        }
+    </style>
+</head>
+<body>
+    <button class="theme-toggle" onclick="toggleTheme()">🌙 Modo Oscuro</button>
+
+    <div class="container">
+        <img id="logo" src="public/logo-light.png" alt="Logo" class="logo">
+        <h1>Cotizador de Envíos 🚚</h1>
+
+        <form id="cotizador-form">
+            <div class="form-section">
+                <h3>📦 Paquete</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="weight">Peso (kg)</label>
+                        <input type="number" id="weight" step="0.1" value="1" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="length">Largo (cm)</label>
+                        <input type="number" id="length" value="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="width">Ancho (cm)</label>
+                        <input type="number" id="width" value="10" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="height">Alto (cm)</label>
+                        <input type="number" id="height" value="10" required>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>📍 Origen</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="origin-name">Nombre</label>
+                        <input type="text" id="origin-name" value="Remitente" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-phone">Teléfono</label>
+                        <input type="text" id="origin-phone" value="5512345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-street">Calle</label>
+                        <input type="text" id="origin-street" value="Av. Principal" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-number">Número</label>
+                        <input type="text" id="origin-number" value="123" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-district">Colonia</label>
+                        <input type="text" id="origin-district" value="Centro" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-postalCode">Código Postal</label>
+                        <input type="text" id="origin-postalCode" required maxlength="5" placeholder="Ej. 03810">
+                        <span id="origin-cp-status" class="cp-status"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-city">Ciudad</label>
+                        <input type="text" id="origin-city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="origin-state">Estado</label>
+                        <input type="text" id="origin-state" required readonly>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-section">
+                <h3>🏁 Destino</h3>
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label for="destination-name">Nombre</label>
+                        <input type="text" id="destination-name" value="Destinatario" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-phone">Teléfono</label>
+                        <input type="text" id="destination-phone" value="5512345678" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-street">Calle</label>
+                        <input type="text" id="destination-street" value="Av. Central" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-number">Número</label>
+                        <input type="text" id="destination-number" value="456" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-district">Colonia</label>
+                        <input type="text" id="destination-district" value="Del Valle" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-postalCode">Código Postal</label>
+                        <input type="text" id="destination-postalCode" required maxlength="5" placeholder="Ej. 55120">
+                        <span id="destination-cp-status" class="cp-status"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-city">Ciudad</label>
+                        <input type="text" id="destination-city" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="destination-state">Estado</label>
+                        <input type="text" id="destination-state" required readonly>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" id="submit-button">Cotizar Envío</button>
+        </form>
+
+        <div id="results-container"></div>
+    </div>
+
+    <script>
+        // 🌙 Modo oscuro
+        function toggleTheme() {
+            const html = document.documentElement;
+            const logo = document.getElementById('logo');
+            const button = document.querySelector('.theme-toggle');
+            if (html.getAttribute('data-theme') === 'dark') {
+                html.setAttribute('data-theme', 'light');
+                logo.src = 'public/logo-light.png';
+                button.textContent = '🌙 Modo Oscuro';
+            } else {
+                html.setAttribute('data-theme', 'dark');
+                logo.src = 'public/logo-dark.png';
+                button.textContent = '☀️ Modo Claro';
+            }
+        }
+
+        // 🔧 Configuración de GitHub
+        const GITHUB_USER = 'RafaV29';     // 👈 CAMBIA: tu usuario de GitHub
+        const GITHUB_REPO = 'cps-mexico'; // 👈 CAMBIA: nombre de tu repo
+        const BASE_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}/json`;
+
+        // 🗺️ Mapeo de códigos de estado (Envia.com 2D → JSON)
+        const estadoClaves = {
+            "AG": "AGU", "BC": "BCN", "BS": "BCS", "CM": "CAM", "CS": "CHP",
+            "CH": "CHH", "CX": "CMX", "CO": "COA", "CL": "COL", "DG": "DGO",
+            "GT": "GTO", "GR": "GRO", "HG": "HGO", "JA": "JAL", "EM": "MEX",
+            "MI": "MIC", "MO": "MOR", "NA": "NAY", "NL": "NLE", "OA": "OAX",
+            "PU": "PUE", "QR": "ROO", "SL": "SLP", "SI": "SIN", "SO": "SON",
+            "TB": "TAB", "TM": "TAM", "TL": "TLA", "VE": "VER", "YU": "YUC", "ZA": "ZAC"
+        };
+
+        // ✅ Estados oficiales Envia.com (2 dígitos)
+        const estadosEnvia = {
+            "Aguascalientes": "AG", "Baja California": "BC", "Baja California Sur": "BS",
+            "Campeche": "CM", "Chiapas": "CS", "Chihuahua": "CH", "Ciudad de México": "CX",
+            "Distrito Federal": "DF", "Coahuila": "CO", "Colima": "CL", "Durango": "DG",
+            "Guanajuato": "GT", "Guerrero": "GR", "Hidalgo": "HG", "Jalisco": "JA",
+            "México": "EM", "Michoacán": "MI", "Morelos": "MO", "Nayarit": "NA",
+            "Nuevo León": "NL", "Oaxaca": "OA", "Puebla": "PU", "Querétaro": "QT",
+            "Quintana Roo": "QR", "San Luis Potosí": "SL", "Sinaloa": "SI", "Sonora": "SO",
+            "Tabasco": "TB", "Tamaulipas": "TM", "Tlaxcala": "TL", "Veracruz": "VE",
+            "Yucatán": "YU", "Zacatecas": "ZA"
+        };
+
+        // ✅ Autocompletar desde JSON en GitHub
+        async function autocompletarDesdeGitHub(tipo) {
+            const cpInput = document.getElementById(`${tipo}-postalCode`);
+            const cityInput = document.getElementById(`${tipo}-city`);
+            const stateInput = document.getElementById(`${tipo}-state`);
+            const statusSpan = document.getElementById(`${tipo}-cp-status`);
+
+            const cp = cpInput.value.trim();
+            cityInput.value = '';
+            stateInput.value = '';
+            statusSpan.textContent = '';
+
+            if (cp.length !== 5 || !/^\d{5}$/.test(cp)) {
+                statusSpan.textContent = 'CP inválido.';
+                statusSpan.style.color = 'red';
+                return;
+            }
+
+            const estadoCodigo = cp.substring(0, 2);
+            const estadoNombre = Object.keys(estadosEnvia).find(key => estadosEnvia[key] === estadoCodigo);
+            if (!estadoNombre) {
+                statusSpan.textContent = 'Estado no soportado.';
+                statusSpan.style.color = 'red';
+                return;
+            }
+
+            const jsonKey = estadoClaves[estadoCodigo];
+            if (!jsonKey) {
+                statusSpan.textContent = 'Archivo no disponible.';
+                statusSpan.style.color = 'red';
+                return;
+            }
+
+            const url = `${BASE_URL}/${jsonKey}.json`;
+
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('Red no disponible');
+
+                const data = await response.json();
+                const asentamiento = data.find(item => item.d_codigo === cp);
+
+                if (asentamiento) {
+                    const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || asentamiento.d_estado;
+                    const estadoOficial = asentamiento.d_estado;
+                    const codigo2D = estadosEnvia[estadoOficial];
+
+                    cityInput.value = ciudad;
+                    stateInput.value = codigo2D || estadoCodigo;
+
+                    statusSpan.textContent = `✓ ${ciudad}`;
+                    statusSpan.style.color = 'green';
+                } else {
+                    statusSpan.textContent = 'CP no encontrado.';
+                    statusSpan.style.color = 'orange';
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                statusSpan.textContent = 'Error al cargar datos.';
+                statusSpan.style.color = 'red';
+            }
+        }
+
+        // Asociar eventos
+        document.getElementById('origin-postalCode').addEventListener('blur', () => autocompletarDesdeGitHub('origin'));
+        document.getElementById('destination-postalCode').addEventListener('blur', () => autocompletarDesdeGitHub('destination'));
+
+        // ✅ Intentar con múltiples carriers
+        const carriersToTry = ["fedex", "dhl", "estafeta", "paquetexpress", "redpack", "ninetynineminutes"];
+
+        async function cotizarConMultiplesCarriers() {
+            const resultsContainer = document.getElementById('results-container');
+            const submitButton = document.getElementById('submit-button');
+
+            resultsContainer.innerHTML = '<div class="loader">Probando carriers...</div>';
+            submitButton.disabled = true;
+
+            const todasLasCotizaciones = [];
+
+            for (const carrier of carriersToTry) {
+                resultsContainer.innerHTML = `<div class="loader">Probando con ${carrier.toUpperCase()}...</div>`;
+                const cotizaciones = await cotizarConCarrier(carrier);
+                if (cotizaciones) {
+                    todasLasCotizaciones.push(...cotizaciones);
+                }
+                await new Promise(resolve => setTimeout(resolve, 500));
+            }
+
+            if (todasLasCotizaciones.length > 0) {
+                mostrarResultados(todasLasCotizaciones);
+            } else {
+                resultsContainer.innerHTML = '<div class="error">No se encontraron cotizaciones.</div>';
+            }
+
+            submitButton.disabled = false;
+        }
+
+        async function cotizarConCarrier(carrier) {
+            const origin = {
+                name: document.getElementById('origin-name').value,
+                phone: document.getElementById('origin-phone').value,
+                street: document.getElementById('origin-street').value,
+                number: document.getElementById('origin-number').value,
+                district: document.getElementById('origin-district').value,
+                city: document.getElementById('origin-city').value,
+                state: document.getElementById('origin-state').value,
+                country: "MX",
+                postalCode: document.getElementById('origin-postalCode').value
+            };
+
+            const destination = {
+                name: document.getElementById('destination-name').value,
+                phone: document.getElementById('destination-phone').value,
+                street: document.getElementById('destination-street').value,
+                number: document.getElementById('destination-number').value,
+                district: document.getElementById('destination-district').value,
+                city: document.getElementById('destination-city').value,
+                state: document.getElementById('destination-state').value,
+                country: "MX",
+                postalCode: document.getElementById('destination-postalCode').value
+            };
+
+            const packages = [{
+                content: "Producto",
+                amount: 1,
+                type: "box",
+                weight: parseFloat(document.getElementById('weight').value),
+                insurance: 0,
+                declaredValue: 0,
+                weightUnit: "KG",
+                lengthUnit: "CM",
+                dimensions: {
+                    length: parseInt(document.getElementById('length').value),
+                    width: parseInt(document.getElementById('width').value),
+                    height: parseInt(document.getElementById('height').value)
+                }
+            }];
+
+            try {
+                const response = await fetch('/api/rate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ origin, destination, packages, shipment: { type: 0, carrier } })
+                });
+
+                const data = await response.json();
+                if (response.ok && data?.data?.length > 0) {
+                    return data.data;
+                }
+                return null;
+            } catch (err) {
+                console.error(`Error con ${carrier}:`, err);
+                return null;
+            }
+        }
+
+        function mostrarResultados(cotizaciones) {
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.innerHTML = '<h2>✅ Cotizaciones</h2>';
+            cotizaciones.forEach(quote => {
+                const card = document.createElement('div');
+                card.className = 'result-card';
+                card.innerHTML = `
+                    <div>
+                        <div class="carrier">${quote.carrierDescription || quote.carrier} (${quote.service})</div>
+                        <div>Entrega: ${quote.deliveryEstimate || 'No disponible'}</div>
+                    </div>
+                    <div class="price">$${parseFloat(quote.totalPrice).toFixed(2)} ${quote.currency}</div>
+                `;
+                resultsContainer.appendChild(card);
+            });
+        }
+
+        // ✅ Evento del formulario
+        document.getElementById('cotizador-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+            await cotizarConMultiplesCarriers();
+        });
+    </script>
+</body>
+</html>
