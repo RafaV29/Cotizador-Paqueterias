@@ -294,30 +294,22 @@
         }
 
         // 🔧 Configuración de GitHub
-        const GITHUB_USER = 'RafaV29';     // 👈 CAMBIA: tu usuario de GitHub
-        const GITHUB_REPO = 'cps-mexico';        // 👈 CAMBIA: nombre de tu repositorio
+        const GITHUB_USER = 'tu-usuario';     // 👈 CAMBIA: tu usuario de GitHub
+        const GITHUB_REPO = 'tu-repo';        // 👈 CAMBIA: nombre de tu repositorio
         const BASE_URL = `https://cdn.jsdelivr.net/gh/${GITHUB_USER}/${GITHUB_REPO}/json`;
 
         // 🔢 Mapeo de los primeros 2 dígitos del CP → estado clave
         const cpToEstado = {
-            "01": "CDMX", "02": "CDMX", "03": "CDMX", "04": "CDMX", "05": "CDMX", "06": "CDMX", "07": "CDMX", "08": "EM",
-            "09": "EM", "10": "EM", "11": "EM", "12": "EM", "13": "EM", "14": "EM", "15": "EM", "16": "EM",
-            "17": "EM", "18": "EM", "19": "EM",
-            "20": "AG", "21": "BC", "22": "BC", "23": "BS", "24": "CM", "25": "CS", "26": "CH", "27": "CL",
-            "28": "CO", "29": "CH", "30": "CH", "31": "CH", "32": "CH", "33": "CH", "34": "CH", "35": "DG",
-            "36": "GT", "37": "GT", "38": "GT", "39": "GT",
-            "40": "GR", "41": "GR", "42": "GR", "43": "GR", "44": "JA", "45": "JA", "46": "JA", "47": "JA",
-            "48": "JA", "49": "JA",
-            "50": "EM", "51": "EM", "52": "EM", "53": "EM", "54": "EM", "55": "EM", "56": "EM", "57": "EM",
-            "58": "MI", "59": "MI",
-            "60": "MZ", "61": "MZ", "62": "OA", "63": "OA", "64": "NL", "65": "NL", "66": "NL", "67": "NL",
-            "68": "OA", "69": "OA",
-            "70": "CH", "71": "CH", "72": "PU", "73": "PU", "74": "PU", "75": "PU", "76": "PU", "77": "QR",
-            "78": "SL", "79": "SL",
-            "80": "SI", "81": "SI", "82": "SI", "83": "SO", "84": "SO", "85": "SO", "86": "TB", "87": "TM",
-            "88": "TM", "89": "TM",
-            "90": "TL", "91": "VE", "92": "VE", "93": "VE", "94": "VE", "95": "VE", "96": "VE", "97": "YU",
-            "98": "ZT", "99": "ZT"
+            "01": "CDMX", "02": "CDMX", "03": "CDMX", "04": "CDMX", "05": "CDMX", "06": "CDMX", "07": "CDMX", "08": "CDMX", "09": "CDMX",
+            "10": "EM", "11": "EM", "12": "EM", "13": "EM", "14": "EM", "15": "EM", "16": "EM", "17": "EM", "18": "EM", "19": "EM",
+            "20": "AG", "21": "BC", "22": "BC", "23": "BS", "24": "CM", "25": "CS", "26": "CH", "27": "CO", "28": "CL", "29": "DG",
+            "30": "GT", "31": "GR", "32": "HG", "33": "JA", "34": "EM", "35": "DG", "36": "GT", "37": "MI", "38": "MO", "39": "NA",
+            "40": "NL", "41": "NL", "42": "NL", "43": "NL", "44": "NL", "45": "NL", "46": "NL", "47": "NL", "48": "NL", "49": "NL",
+            "50": "EM", "51": "EM", "52": "EM", "53": "EM", "54": "EM", "55": "EM", "56": "EM", "57": "EM", "58": "MI", "59": "MI",
+            "60": "MZ", "61": "MZ", "62": "OA", "63": "OA", "64": "NL", "65": "NL", "66": "NL", "67": "NL", "68": "OA", "69": "OA",
+            "70": "CH", "71": "CH", "72": "PU", "73": "PU", "74": "PU", "75": "PU", "76": "PU", "77": "QR", "78": "SL", "79": "SL",
+            "80": "SI", "81": "SI", "82": "SI", "83": "SO", "84": "SO", "85": "SO", "86": "TB", "87": "TM", "88": "TM", "89": "TM",
+            "90": "TL", "91": "VE", "92": "VE", "93": "VE", "94": "VE", "95": "VE", "96": "VE", "97": "YU", "98": "ZT", "99": "ZT"
         };
 
         // 🗺️ Nombre completo del estado
@@ -367,7 +359,7 @@
             "YU": "YUC", "ZA": "ZAC"
         };
 
-        // ✅ Autocompletar desde GitHub
+        // ✅ Autocompletar desde GitHub (con logs)
         async function autocompletarDesdeGitHub(tipo) {
             const cpInput = document.getElementById(`${tipo}-postalCode`);
             const cityInput = document.getElementById(`${tipo}-city`);
@@ -379,22 +371,31 @@
             stateInput.value = '';
             statusSpan.textContent = '';
 
+            console.log('🔍 [Autocompletar] Código postal ingresado:', cp);
+
             if (cp.length !== 5 || !/^\d{5}$/.test(cp)) {
                 statusSpan.textContent = 'CP inválido.';
                 statusSpan.style.color = 'red';
+                console.warn('❌ CP no válido:', cp);
                 return;
             }
 
             const cpPrefix = cp.substring(0, 2);
+            console.log('🔢 Prefijo (2 dígitos):', cpPrefix);
+
             const estadoClave = cpToEstado[cpPrefix];
+            console.log('🔑 Estado clave mapeado:', estadoClave);
 
             if (!estadoClave) {
                 statusSpan.textContent = 'Estado no soportado.';
                 statusSpan.style.color = 'red';
+                console.error('❌ No se encontró estado para el prefijo:', cpPrefix);
                 return;
             }
 
             const estadoNombre = nombreEstado[estadoClave];
+            console.log('📌 Nombre del estado:', estadoNombre);
+
             const codigo2D = {
                 "Aguascalientes": "AG",
                 "Baja California": "BC",
@@ -433,6 +434,7 @@
             if (!codigo2D) {
                 statusSpan.textContent = 'Código de estado inválido.';
                 statusSpan.style.color = 'red';
+                console.error('❌ No se encontró código 2D para:', estadoNombre);
                 return;
             }
 
@@ -440,17 +442,25 @@
             if (!jsonKey) {
                 statusSpan.textContent = 'Archivo no disponible.';
                 statusSpan.style.color = 'red';
+                console.error('❌ No hay archivo JSON para:', codigo2D);
                 return;
             }
 
             const url = `${BASE_URL}/${jsonKey}.json`;
+            console.log('🌐 URL del JSON:', url);
 
             try {
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('No disponible');
+                if (!response.ok) {
+                    console.error('❌ Error al cargar JSON:', response.status, response.statusText);
+                    throw new Error('No disponible');
+                }
 
                 const data = await response.json();
+                console.log('✅ JSON cargado con', data.length, 'registros');
+
                 const asentamiento = data.find(item => item.d_codigo === cp);
+                console.log('🔎 Búsqueda de CP:', cp, '→ Encontrado:', asentamiento ? 'Sí' : 'No');
 
                 if (asentamiento) {
                     const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || estadoNombre;
@@ -458,12 +468,14 @@
                     stateInput.value = codigo2D;
                     statusSpan.textContent = `✓ ${ciudad}`;
                     statusSpan.style.color = 'green';
+                    console.log('✅ Autocompletado exitoso:', { ciudad, estado: codigo2D });
                 } else {
                     statusSpan.textContent = 'CP no encontrado.';
                     statusSpan.style.color = 'orange';
+                    console.warn('🟡 CP no encontrado en el archivo JSON');
                 }
             } catch (error) {
-                console.error('Error:', error);
+                console.error('🚨 Error en autocompletado:', error);
                 statusSpan.textContent = 'Error al cargar datos.';
                 statusSpan.style.color = 'red';
             }
