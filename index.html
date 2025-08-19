@@ -348,18 +348,42 @@
             "ZA": "Zacatecas"
         };
 
-        // 📦 Mapeo de estado clave → archivo JSON
+        // 📦 Mapeo de estado clave → archivo JSON (actualizado para tus nombres)
         const estadoJsonMap = {
-            "AG": "AGU", "BC": "BCN", "BS": "BCS", "CM": "CAM", "CS": "CHP",
-            "CH": "CHH", "CDMX": "CMX", "CO": "COA", "CL": "COL", "DG": "DGO",
-            "GT": "GTO", "GR": "GRO", "HG": "HGO", "JA": "JAL", "EM": "MEX",
-            "MI": "MIC", "MO": "MOR", "NA": "NAY", "NL": "NLE", "OA": "OAX",
-            "PU": "PUE", "QT": "QRO", "QR": "ROO", "SL": "SLP", "SI": "SIN",
-            "SO": "SON", "TB": "TAB", "TM": "TAM", "TL": "TLA", "VE": "VER",
-            "YU": "YUC", "ZA": "ZAC"
+            "AG": "CP_AGUASCALIENTES",
+            "BC": "CP_BAJA_CALIFORNIA_NORTE",
+            "BS": "CP_BAJA_CALIFORNIA_SUR",
+            "CM": "CP_CAMPECHE",
+            "CS": "CP_CHIAPAS",
+            "CH": "CP_CHIHUAHUA",
+            "CO": "CP_COAHUILA",
+            "CL": "CP_COLIMA",
+            "DG": "CP_DURANGO",
+            "GT": "CP_GUANAJUATO",
+            "GR": "CP_GUERRERO",
+            "HG": "CP_HIDALGO",
+            "JA": "CP_JALISCO",
+            "EM": "CP_EDO_MEX",
+            "MI": "CP_MICHOACAN",
+            "MO": "CP_MORELOS",
+            "NA": "CP_NAYARIT",
+            "NL": "CP_NUEVO_LEON",
+            "OA": "CP_OAXACA",
+            "PU": "CP_PUEBLA",
+            "QT": "CP_QUERETARO",
+            "QR": "CP_QUINTANA_ROO",
+            "SL": "CP_SAN_LUIS_POTOSI",
+            "SI": "CP_SINALOA",
+            "SO": "CP SONORA",
+            "TB": "CP_TABASCO",
+            "TM": "CP_TAMAUlipas",
+            "TL": "CP_TLAXCALA",
+            "VE": "CP_VERACRUZ",
+            "YU": "CP_YUCATAN",
+            "ZA": "CP_ZACATECAS"
         };
 
-        // ✅ Autocompletar desde GitHub (con logs)
+        // ✅ Autocompletar desde GitHub
         async function autocompletarDesdeGitHub(tipo) {
             const cpInput = document.getElementById(`${tipo}-postalCode`);
             const cityInput = document.getElementById(`${tipo}-city`);
