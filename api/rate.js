@@ -1,17 +1,12 @@
 // api/rate.js
 export default async function handler(req, res) {
-  // ✅ Configurar CORS
+  // ✅ Encabezados CORS
   res.setHeader('Access-Control-Allow-Origin', '*');
-  // O mejor: solo tu dominio
-  // res.setHeader('Access-Control-Allow-Origin', 'https://cotizador-paqueterias.vercel.app');
-  
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
 
-  // Manejar preflight (OPTIONS)
   if (req.method === 'OPTIONS') {
-    res.status(200).end();
-    return;
+    return res.status(200).end();
   }
 
   if (req.method !== 'POST') {
@@ -29,7 +24,7 @@ export default async function handler(req, res) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.ENVIACOM_TOKEN}`,
+        'Authorization': `Bearer ${process.env.ENVIACOM_TOKEN}`
       },
       body: JSON.stringify({
         origin,
@@ -46,3 +41,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: 'Error interno del servidor' });
   }
 }
+
