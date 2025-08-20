@@ -596,13 +596,26 @@
                 }
             }];
 
-            console.log('📤 Enviando a API:', { origin, destination, packages, carrier });
+            console.log('📤 Enviando a API:', {
+                origin,
+                destination,
+                packages,
+                shipment: { type: 0, carrier }
+            });
 
             try {
                 const response = await fetch('https://cotizador-paqueterias.vercel.app/api/rate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ origin, destination, packages, shipment: { type: 0, carrier } })
+                    body: JSON.stringify({
+                        origin,
+                        destination,
+                        packages,
+                        shipment: {
+                            type: 0,
+                            carrier: carrier  // ✅ Corregido: dentro de shipment
+                        }
+                    })
                 });
 
                 const data = await response.json();
@@ -643,3 +656,4 @@
     </script>
 </body>
 </html>
+
