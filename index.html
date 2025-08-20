@@ -581,7 +581,7 @@
             }];
 
             try {
-                const response = await fetch('https://TU-COTIZADOR.vercel.app/api/rate', {
+                const response = await fetch('https://cotizador-paqueterias.vercel.app/api/rate', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ origin, destination, packages, shipment: { type: 0, carrier } })
@@ -623,5 +623,6 @@
     </script>
 </body>
 </html>
+
 
 
