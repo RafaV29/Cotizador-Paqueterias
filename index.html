@@ -348,7 +348,7 @@
             "ZA": "Zacatecas"
         };
 
-        // 📦 Mapeo de estado clave → archivo JSON (ajustado a tus nombres)
+        // 📦 Mapeo de estado clave → archivo JSON
         const estadoJsonMap = {
             "AG": "CP_AGUASCALIENTES",
             "BC": "CP_BAJA_CALIFORNIA_NORTE",
@@ -489,7 +489,7 @@
                 if (asentamiento) {
                     const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || estadoNombre;
                     cityInput.value = ciudad;
-                    stateInput.value = codigo2D; // ✅ Aseguramos que sea 2 letras
+                    stateInput.value = codigo2D;
                     statusSpan.textContent = `✓ ${ciudad}`;
                     statusSpan.style.color = 'green';
                     console.log('✅ Autocompletado exitoso:', { ciudad, estado: codigo2D });
@@ -519,7 +519,6 @@
             resultsContainer.innerHTML = '<div class="loader">Probando carriers...</div>';
             submitButton.disabled = true;
 
-            // ✅ Validación antes de enviar
             const originState = document.getElementById('origin-state').value;
             const destinationState = document.getElementById('destination-state').value;
 
@@ -656,4 +655,3 @@
     </script>
 </body>
 </html>
-
