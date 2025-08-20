@@ -294,8 +294,8 @@
         }
 
         // 🔧 Configuración de GitHub
-        const GITHUB_USER = 'RafaV29';     // 👈 CAMBIA: tu usuario de GitHub
-        const GITHUB_REPO = 'cps-mexico';        // 👈 CAMBIA: nombre de tu repositorio
+        const GITHUB_USER = 'RafaV29';
+        const GITHUB_REPO = 'cps-mexico';
         const BASE_URL = `https://${GITHUB_USER}.github.io/${GITHUB_REPO}`;
 
         // 🔢 Mapeo de los primeros 2 dígitos del CP → estado clave
@@ -348,7 +348,7 @@
             "ZA": "Zacatecas"
         };
 
-        // 📦 Mapeo de estado clave → archivo JSON (actualizado para tus nombres)
+        // 📦 Mapeo de estado clave → archivo JSON (ajustado a tus nombres)
         const estadoJsonMap = {
             "AG": "CP_AGUASCALIENTES",
             "BC": "CP_BAJA_CALIFORNIA_NORTE",
@@ -374,7 +374,7 @@
             "QR": "CP_QUINTANA_ROO",
             "SL": "CP_SAN_LUIS_POTOSI",
             "SI": "CP_SINALOA",
-            "SO": "CP SONORA",
+            "SO": "CP_SONORA",
             "TB": "CP_TABASCO",
             "TM": "CP_TAMAULIPAS",
             "TL": "CP_TLAXCALA",
@@ -489,7 +489,7 @@
                 if (asentamiento) {
                     const ciudad = asentamiento.d_mnpio || asentamiento.d_ciudad || estadoNombre;
                     cityInput.value = ciudad;
-                    stateInput.value = codigo2D;
+                    stateInput.value = codigo2D; // ✅ Aseguramos que sea 2 letras
                     statusSpan.textContent = `✓ ${ciudad}`;
                     statusSpan.style.color = 'green';
                     console.log('✅ Autocompletado exitoso:', { ciudad, estado: codigo2D });
@@ -518,6 +518,22 @@
 
             resultsContainer.innerHTML = '<div class="loader">Probando carriers...</div>';
             submitButton.disabled = true;
+
+            // ✅ Validación antes de enviar
+            const originState = document.getElementById('origin-state').value;
+            const destinationState = document.getElementById('destination-state').value;
+
+            if (originState.length !== 2) {
+                resultsContainer.innerHTML = '<div class="error">Estado de origen debe tener 2 letras.</div>';
+                submitButton.disabled = false;
+                return;
+            }
+
+            if (destinationState.length !== 2) {
+                resultsContainer.innerHTML = '<div class="error">Estado de destino debe tener 2 letras.</div>';
+                submitButton.disabled = false;
+                return;
+            }
 
             const todasLasCotizaciones = [];
 
@@ -580,6 +596,8 @@
                 }
             }];
 
+            console.log('📤 Enviando a API:', { origin, destination, packages, carrier });
+
             try {
                 const response = await fetch('https://cotizador-paqueterias.vercel.app/api/rate', {
                     method: 'POST',
@@ -588,6 +606,8 @@
                 });
 
                 const data = await response.json();
+                console.log('📥 Respuesta de API:', data);
+
                 if (response.ok && data?.data?.length > 0) {
                     return data.data;
                 }
@@ -623,6 +643,3 @@
     </script>
 </body>
 </html>
-
-
-
